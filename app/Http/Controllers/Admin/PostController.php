@@ -20,7 +20,7 @@ class PostController extends AdminController
      */
     public function index(Request $request)
     {
-        $posts = $this->repository->orderBy('created_at','desc')->paginate(10);
+        $posts = $this->repository->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.post.index', [
             'posts' => $posts
         ]);
@@ -44,6 +44,10 @@ class PostController extends AdminController
             ->with('message', ['type' => 'success', 'message' => 'Wpis został dodany']);
     }
 
+    /**
+     * @param int $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     */
     public function show(int $id)
     {
         return view('admin.post.show', [
@@ -77,7 +81,7 @@ class PostController extends AdminController
      */
     public function destroy(DeletePostRequest $request)
     {
-        if ($this->repository->delete($request->get('id'))){
+        if ($this->repository->delete($request->get('id'))) {
             return to_route('admin.post.index')->with('message', ['type' => 'warn', 'message' => 'Wpis został usunięty']);
         }
     }

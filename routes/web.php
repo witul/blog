@@ -42,7 +42,7 @@ Route::post('/email/verification-notification', function (\Illuminate\Http\Reque
 
 Route::get('/create-account', [AccountController::class, 'registration'])
     ->middleware('guest')
-    ->name('account.registration');
+    ->name('blog.account.registration');
 
 Route::post('/account', [AccountController::class, 'store'])
     ->middleware('guest')
@@ -66,40 +66,34 @@ Route::get('/logout', [AccountController::class, 'logout'])
 //    return view('auth.forgot-password');
 
 
-Route::get('/forgot-password', [AccountController::class, 'forgotPassword'])->middleware('guest')->name('password.request');
-Route::get('/password-forgot', [AccountController::class, 'forgotPassword'])
-    ->middleware('guest')
-    ->name('password.request');
+Route::get('/password-forgot', [AccountController::class, 'forgotPassword'])->middleware('guest')->name('password.request');
+
 Route::post('/password-forgot', [AccountController::class, 'sendResetPasswordLink'])
     ->middleware('guest')
     ->name('password.send-reset-link');
 
 
+
 Route::get('/account/create', [AccountController::class, 'registrationForm'])
     ->middleware('guest')
     ->name('account.create');
-
 Route::post('/account/create', [AccountController::class, 'store'])
     ->middleware('guest')
     ->name('account.store');
 
+
+
 /** Forgot password - creating form and handling email from user */
+
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->middleware('guest')->name('password.request');
 
-Route::post('/forgot-password', function (Request $request) {
-    $request->validate(['email' => 'required|email']);
 
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
 
-    return $status === Password::RESET_LINK_SENT
-        ? back()->with(['status' => __($status)])
-        : back()->withErrors(['email' => __($status)]);
-})->middleware('guest')->name('password.email');
+Route::post('/forgot-password', [AccountController::class,'forgotPassword'])
+    ->middleware('guest')->name('password.email');
 
 
 /* Forgot password ops */
@@ -110,25 +104,12 @@ Route::get('/reset-password/{token}', function (string $token) {
 
 // Handling reset password form
 Route::post('/reset-password', function (Request $request) {
-    $request->validate([
-        'token' => 'required',
-        'email' => 'required|email',
-        'password' => 'required|min:8|confirmed',
-    ]);
 
-    $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function (User $user, string $password) {
-            $user->forceFill([
-                'password' => Hash::make($password)
-            ])->setRememberToken(Str::random(60));
-            $user->save();
-
-            event(new PasswordReset($user));
-        }
-    );
-    return $status === Password::PASSWORD_RESET
-        ? redirect()->route('login')->with('status', __($status))
-        : back()->withErrors(['email' => [__($status)]]);
 })->middleware('guest')->name('password.update');
 
+
+
+Route::fallback(function() {
+    return redirect('/');
+    //return 'Hm, why did you land here somehow?';
+});

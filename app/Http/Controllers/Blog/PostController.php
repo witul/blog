@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Blog;
 
 use App\Repositories\PostRepositoryInterface;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 class PostController extends BlogBaseController
 {
@@ -12,14 +10,11 @@ class PostController extends BlogBaseController
     {
     }
 
-
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-   //     return response()->json($this->repository->paginate(10)->toArray());
-
         return view('home', ['posts' => $this->repository->orderBy('created_at','desc')->paginate(10)]);
     }
 
@@ -28,7 +23,6 @@ class PostController extends BlogBaseController
      */
     public function get($id)
     {
-       // return response()->json($this->repository->findById($id));
         return view('blog.post.show', ['post' => $this->repository->findById($id)]);
     }
 

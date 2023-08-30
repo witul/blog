@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Blog;
 
-use App\Http\Requests\Account\AccountRequest;
 use App\Http\Requests\Account\LoginRequest;
 use App\Http\Requests\Account\StoreAccountRequest;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 
 class AccountController extends BlogBaseController
 {
@@ -16,13 +16,11 @@ class AccountController extends BlogBaseController
     }
 
     /**
-     * Display a listing of the resource.
+     * Display an registration form view
      */
     public function registration()
     {
-        return view('account.registration', [
-            //'posts' => $this->repository->paginate(10)
-        ]);
+        return view('blog.account.registration');
     }
 
     /**
@@ -33,6 +31,10 @@ class AccountController extends BlogBaseController
         return view('post.show', ['post' => $this->repository->findById($id)]);
     }
 
+    /**
+     * @param StoreAccountRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(StoreAccountRequest $request)
     {
         $data = $request->only(['name', 'email', 'password']);
@@ -45,15 +47,22 @@ class AccountController extends BlogBaseController
 
         //dd($data);
         //return to_route('');
-        return to_route('blog.home');
+        return to_route('blog.home')->with('message', ['type' => 'success', 'message' => 'Konto zostało utworzone']);;
     }
 
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     */
     public function login()
     {
-        return view('account.login', []);
+        return view('blog.account.login', []);
     }
 
 
+    /**
+     * @param LoginRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function authenticate(LoginRequest $request)
     {
 
@@ -70,6 +79,10 @@ class AccountController extends BlogBaseController
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function logout(Request $request): \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
     {
         Auth::logout();
@@ -84,14 +97,27 @@ class AccountController extends BlogBaseController
     /**
      * Display a listing of the resource.
      */
-    public function forgotPassword()
+    public function forgotPassword(Request $request)
     {
-        return view('account.reset-password', [
-            //'posts' => $this->repository->paginate(10)
-        ]);
+        $request->validate(['email' => 'required|email']);
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return ($status === Password::RESET_LINK_SENT
+            ? back()->with(['status' => __($status)])->with('message', ['type' => 'success', 'message' => 'Instrukcja została wysłana na maila'])
+            : back()->withErrors(['email' => __($status)])->with('message', ['type' => 'error', 'message' => 'Nie udało się wysłać wiadomości']));
+
+        //  return view('account.reset-password', [
+        //'posts' => $this->repository->paginate(10)
     }
 
-    public function resetPassword(Request $request){
+    /**
+     * @param Request $request
+     * @return void
+     */
+    public function resetPassword(Request $request)
+    {
         dump($request);
     }
 

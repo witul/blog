@@ -16,7 +16,7 @@
         @if(!Auth::id())
             <a href="{{ route('blog.home') }}">Start</a>
             <a href="{{ route('login') }}">Logowanie</a>
-            <a href="{{ route('account.registration') }}">Rejestracja</a>
+            <a href="{{ route('blog.account.registration') }}">Rejestracja</a>
         @else
             @can('access-admin')
                 <a href="{{ route('admin.post.index') }}">Panel</a>
