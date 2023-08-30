@@ -23,7 +23,6 @@
             @if(!is_array($posts))
                 <div class="pt-4" style="max-height: 200px;!important;">{{ $posts->links() }}</div>
                 <div class="pt-8"></div>
-                <x-nav-bar>asdasd</x-nav-bar>
     @else
         @dump($posts)
     @endif
