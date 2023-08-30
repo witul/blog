@@ -47,12 +47,16 @@ class UserController extends AdminController
     public function store(StoreUserRequest $request)
     {
 
-        if($request->isNotFilled('password')){
+
+        if ($request->isNotFilled('password')) {
             $request->merge(['password' => Str::random(8)]);
         }
         $model = $this->repository->store($request->only(['name', 'email', 'password', 'role']));
 
-        event(new Registered($model));
+        //$data = $request->only(['name', 'email', 'password']);
+        //$model = $this->repository->store($data);
+        dispatch(new \App\Jobs\FinalizeNewAccount($model->id));
+        //event(new Registered($model));
 
         return to_route('admin.user.edit', ['id' => $model->id])
             ->with('message', ['type' => 'success', 'message' => 'Użytkownik został dodany']);
@@ -114,7 +118,7 @@ class UserController extends AdminController
      */
     public function destroy(DeleteUserRequest $request)
     {
-        if ($this->repository->delete($request->get('id'))){
+        if ($this->repository->delete($request->get('id'))) {
             return to_route('admin.user.index')->with('message', ['type' => 'warn', 'message' => 'Użytkownik został usunięty']);
         }
     }

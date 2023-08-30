@@ -42,8 +42,6 @@ class AccountController extends BlogBaseController
         dispatch(new \App\Jobs\FinalizeNewAccount($model->id));
 //        $model)($model));
 //
-
-
         //dd($data);
         //return to_route('');
         return to_route('blog.home')->with('message', ['type' => 'success', 'message' => 'Konto zostało utworzone']);;
