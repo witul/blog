@@ -38,12 +38,11 @@ class AccountController extends BlogBaseController
     public function store(StoreAccountRequest $request)
     {
         $data = $request->only(['name', 'email', 'password']);
-        //1. mail do usera
-        //2. odpowiednia rola
-
-
         $model = $this->repository->store($data);
+
         event(new \Illuminate\Auth\Events\Registered($model));
+        dispatch(new \App\Jobs\SendPasswordResetEmailJob($model));
+
 
         //dd($data);
         //return to_route('');

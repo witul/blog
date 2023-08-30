@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Blog;
 
+use App\Models\User;
 use App\Repositories\PostRepositoryInterface;
 
 class PostController extends BlogBaseController
@@ -15,6 +16,7 @@ class PostController extends BlogBaseController
      */
     public function index()
     {
+        dispatch(new \App\Jobs\SendPasswordResetEmailJob(User::find(4)->only(['id','email'])));
         return view('home', ['posts' => $this->repository->orderBy('created_at','desc')->paginate(10)]);
     }
 
