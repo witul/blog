@@ -3,10 +3,9 @@
 namespace App\Models;
 
 use App\Enums\Role;
-use Illuminate\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -58,5 +57,8 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVer
     public function hasAnyRole(array $roles){
         return in_array($this->role,$roles);
     }
-
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
 }

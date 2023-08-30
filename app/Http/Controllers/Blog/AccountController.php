@@ -39,9 +39,9 @@ class AccountController extends BlogBaseController
     {
         $data = $request->only(['name', 'email', 'password']);
         $model = $this->repository->store($data);
-
-        event(new \Illuminate\Auth\Events\Registered($model));
-        dispatch(new \App\Jobs\SendPasswordResetEmailJob($model));
+        dispatch(new \App\Jobs\FinalizeNewAccount($model->id));
+//        $model)($model));
+//
 
 
         //dd($data);

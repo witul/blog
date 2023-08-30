@@ -2,36 +2,35 @@
 
 namespace App\Jobs;
 
-use App\Mail\PasswordResetLink;
+use App\Models\User;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
 
-class SendPasswordResetEmailJob implements ShouldQueue
+class FinalizeNewAccount implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $modelId;
     /**
      * Create a new job instance.
      */
-    public function __construct($details)
+    public function __construct($id)
     {
-        $this->details = $details;
+        $this->modelId=$id;
     }
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(UserRepositoryInterface $repository): void
     {
-        $email = new PasswordResetLink();
-     //   dd($this->details);
-        Mail::to('witul@skyhost.pl')->send($email);
-      //  dump($this->details);
+        $model = $repository->findById($this->modelId);
+        event(new \Illuminate\Auth\Events\Registered($model));
         //
     }
 }

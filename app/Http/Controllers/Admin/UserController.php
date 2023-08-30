@@ -62,7 +62,9 @@ class UserController extends AdminController
     public function resetPassword(int $id)
     {
         $model = $this->repository->findById($id);
+
         $status = Password::sendResetLink(['email' => $model->email]);
+
         return to_route('admin.user.edit', ['id' => $model->id])
             ->with('message', ['type' => 'success', 'message' => 'Link do zresetowania hasła został wysłany']);
     }
