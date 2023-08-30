@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Post;
 
-class StorePostRequest extends PostRequest
+use Illuminate\Foundation\Http\FormRequest;
+
+class PostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,7 +22,8 @@ class StorePostRequest extends PostRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|unique:posts',
+            'content' => 'required|string'
         ];
     }
 }

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostRequest extends FormRequest
+class UserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,16 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
         ];
     }
+    protected function prepareForValidation(){
+
+        $this->whenMissing('password_force',function(){
+            $this->offsetUnset('password');
+            $this->offsetUnset('password_confirmation');
+            $this->merge(['password_force'=>0]);
+        });
+    }
+
+
 }
